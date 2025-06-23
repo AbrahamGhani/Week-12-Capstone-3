@@ -27,7 +27,7 @@ public class CategoriesController
 
     // create an Autowired controller to inject the categoryDao and ProductDao
 
-    @GetMapping("/categories")
+    @GetMapping("")
     @PreAuthorize("permitAll()")
     public List<Category> getAll()
     {
@@ -61,7 +61,7 @@ public class CategoriesController
 
     // the url to return all products in category 1 would look like this
     // https://localhost:8080/categories/1/products
-    @GetMapping("/categories/{categoryId}/products")
+    @GetMapping("{categoryId}/products")
     @PreAuthorize("permitAll()")
     public List<Product> getProductsById(@PathVariable int categoryId)
     {

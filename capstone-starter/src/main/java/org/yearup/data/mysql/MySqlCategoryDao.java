@@ -52,8 +52,7 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao
     @Override
     public Category getById(int categoryId)
     {
-        String sql = "SELECT * FROM categories " +
-                " WHERE category_id = ? ";
+        String sql = "SELECT * FROM categories WHERE category_id = ?";
 
         try (Connection connection = getConnection())
         {
@@ -62,16 +61,15 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao
 
             ResultSet row = statement.executeQuery();
 
-            Category category = mapRow(row);
+            if (row.next()) {
+                return mapRow(row);  // ✅ only map if row exists
+            } else {
+                return null;  // Or throw custom NotFoundException
+            }
 
-            return category;
-
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @Override
@@ -114,7 +112,6 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao
     {
         String sql = "UPDATE categories" +
                 " SET name = ? " +
-                "   , category_id = ?" +
                 "   , description = ? " +
                 " WHERE category_id = ?;";
 
@@ -122,9 +119,8 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao
         {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, category.getName());
-            statement.setInt(2, category.getCategoryId());
-            statement.setString(3, category.getDescription());
-            statement.setInt(4, categoryId);
+            statement.setString(2, category.getDescription());
+            statement.setInt(3, categoryId);
             statement.executeUpdate();
         }
         catch (SQLException e)
@@ -158,18 +154,15 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao
 
 
 
-    private Category mapRow(ResultSet row) throws SQLException
-    {
+    private Category mapRow(ResultSet row) throws SQLException {
         int categoryId = row.getInt("category_id");
         String name = row.getString("name");
         String description = row.getString("description");
 
-        Category category = new Category()
-        {{
-            setCategoryId(categoryId);
-            setName(name);
-            setDescription(description);
-        }};
+        Category category = new Category();
+        category.setCategoryId(categoryId);
+        category.setName(name);
+        category.setDescription(description);
 
         return category;
     }
