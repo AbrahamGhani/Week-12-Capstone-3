@@ -1,5 +1,6 @@
 package org.yearup.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -12,19 +13,24 @@ import org.yearup.models.Product;
 import java.math.BigDecimal;
 import java.util.List;
 
-@RestController
-@RequestMapping("categories")
-@CrossOrigin
+
 // add the annotations to make this a REST controller
 // add the annotation to make this controller the endpoint for the following url
     // http://localhost:8080/categories
 // add annotation to allow cross site origin requests
+@RestController
+@RequestMapping("categories")
+@CrossOrigin
 public class CategoriesController
 {
     private CategoryDao categoryDao;
     private ProductDao productDao;
 
-
+@Autowired
+public CategoriesController(CategoryDao categoryDao, ProductDao productDao){
+    this.categoryDao = categoryDao;
+    this.productDao = productDao;
+}
     // create an Autowired controller to inject the categoryDao and ProductDao
 
     @GetMapping("")
@@ -53,6 +59,9 @@ public class CategoriesController
 
             return category;
         }
+        catch (ResponseStatusException ex) {
+            throw ex;
+        }
         catch(Exception ex)
         {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
@@ -77,6 +86,7 @@ public class CategoriesController
 
     @PostMapping()
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.CREATED)
     public Category addCategory(@RequestBody Category category)
     {
         try
@@ -106,6 +116,7 @@ public class CategoriesController
 
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable int id)
     {
         try
