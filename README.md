@@ -9,9 +9,7 @@ This is a Spring Boot-based E-Commerce API that provides RESTful endpoints for m
 I implemented the **Categories functionality** for this E-Commerce API, which includes:
 
 - **CategoriesController** - REST API endpoints for category management
-- **CategoryDao Interface** - Data access contract for categories
 - **MySqlCategoryDao** - MySQL implementation of category data access
-- **Category Model** - Data model for category entities
 
 ### Categories API Endpoints
 
