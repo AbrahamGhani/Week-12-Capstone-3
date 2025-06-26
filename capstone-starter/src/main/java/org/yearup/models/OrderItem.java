@@ -10,19 +10,19 @@ public class OrderItem {
     private int productId;
     private int quantity;
     private BigDecimal price;
-
+    private BigDecimal discount;
 
     public OrderItem() {
     }
 
-    public OrderItem(int id, int orderId, int productId, int quantity, BigDecimal price) {
+    public OrderItem(int id, int orderId, int productId, int quantity, BigDecimal price, BigDecimal discount) {
         this.id = id;
         this.orderId = orderId;
         this.productId = productId;
         this.quantity = quantity;
         this.price = price;
+        this.discount = discount;
     }
-
 
     public int getId() {
         return id;
@@ -62,5 +62,13 @@ public class OrderItem {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public BigDecimal getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(BigDecimal discount) {
+        this.discount = discount;
     }
 }
