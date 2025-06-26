@@ -11,23 +11,24 @@ import org.yearup.data.UserDao;
 import org.yearup.models.ShoppingCart;
 import org.yearup.models.User;
 
-
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Map;
 
-
+// This is a REST controller responsible for handling HTTP requests related to a user's shopping cart.
+// The base URL for all routes in this class is /cart.
 @RestController
 @RequestMapping("cart")
-@CrossOrigin
+@CrossOrigin // Allows this controller to be accessed from a different domain (useful for front-end apps)
 public class ShoppingCartController
 {
-    // a shopping cart requires
+    // Declare dependencies required to access and manipulate user and cart data
     private ShoppingCartDao shoppingCartDao;
     private UserDao userDao;
     private ProductDao productDao;
 
+    // Use constructor injection to automatically supply the required DAOs (Data Access Objects)
     @Autowired
     public ShoppingCartController(UserDao userDao,
                                   ShoppingCartDao shoppingCartDao,
@@ -38,41 +39,42 @@ public class ShoppingCartController
         this.productDao = productDao;
     }
 
-
-
+    // GET /cart
+    // Retrieves the full shopping cart for the currently logged-in user.
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER')") // Only authenticated users with role "USER" can access this
     public ShoppingCart getCart(Principal principal)
     {
         try
         {
-            // get the currently logged in username
+            // Spring Security will pass the logged-in user's name into the 'Principal' object
             String userName = principal.getName();
-            // find database user by userId
+
+            // Look up the full user record from the database
             User user = userDao.getByUserName(userName);
+
             if (user == null) {
-                System.out.println("No user in the database for username: " + userName);
+                // If no matching user is found, return HTTP 404 (Not Found)
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + userName);
             }
 
-            int userId = user.getId();
-
-            // use the shoppingcartDao to get all items in the cart and return the cart
-            return shoppingCartDao.getByUserId(userId);
+            // Use the DAO to get this user's cart and return it to the caller
+            return shoppingCartDao.getByUserId(user.getId());
         }
         catch(Exception e)
         {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad ERROR with getCart.");
+            // If something unexpected happens, return a generic server error
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... error with getCart.");
         }
     }
 
-    // add a POST method to add a product to the cart - the url should be
-    // https://localhost:8080/cart/products/15 (15 is the productId to be added
-
+    // POST /cart/products/{productId}
+    // Adds a product to the shopping cart. If it already exists, the DAO should increase its quantity.
     @PostMapping("/products/{productId}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ShoppingCart addToCart(@PathVariable int productId, Principal principal)
     {
+        // Get the username of the logged-in user
         String username = principal.getName();
         User user = userDao.getByUserName(username);
 
@@ -80,66 +82,61 @@ public class ShoppingCartController
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
 
+        // Add the product to the cart in the database
         shoppingCartDao.addToCart(user.getId(), productId);
 
-        // return updated cart
+        // Return the updated cart back to the user
         return shoppingCartDao.getByUserId(user.getId());
     }
 
-
-    // add a PUT method to update an existing product in the cart - the url should be
-    // https://localhost:8080/cart/products/15 (15 is the productId to be updated)
-    // the BODY should be a ShoppingCartItem - quantity is the only value that will be updated
+    // PUT /cart/products/{productId}
+    // Updates the quantity of an existing product in the user's cart.
     @PutMapping("/products/{productId}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public void updateProductQuantity(
-            @PathVariable int productId,
-            @RequestBody Map<String, Integer> body,
-            Principal principal,
-            HttpServletResponse response) throws IOException
+    public ShoppingCart updateCartItem(@PathVariable int productId,
+                                       @RequestBody Map<String, Integer> body,
+                                       Principal principal)
     {
+        // Get the current user
         String username = principal.getName();
         User user = userDao.getByUserName(username);
 
         if (user == null) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "User not found");
-            return;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
 
-        Integer newQuantity = body.get("quantity");
-        if (newQuantity == null || newQuantity < 1) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Quantity must be >= 1");
-            return;
-        }
+        // Extract the quantity from the request body
+        int quantity = body.get("quantity");
 
-        boolean exists = shoppingCartDao.itemExistsInCart(user.getId(), productId);
-        if (!exists) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Product not found in cart");
-            return;
-        }
+        // Update that product's quantity in the cart
+        shoppingCartDao.updateItemQuantity(user.getId(), productId, quantity);
 
-        shoppingCartDao.updateItemQuantity(user.getId(), productId, newQuantity);
+        // Return the updated cart so the frontend can refresh the view
+        return shoppingCartDao.getByUserId(user.getId());
     }
 
-    // add a DELETE method to clear all products from the current users cart
-    // https://localhost:8080/cart
-
+    // DELETE /cart
+    // Completely clears out the user's shopping cart.
     @DeleteMapping
     @PreAuthorize("hasRole('ROLE_USER')")
-    public void clearCart(Principal principal, HttpServletResponse response) throws IOException {
+    public void clearCart(Principal principal, HttpServletResponse response) throws IOException
+    {
         try {
+            // Identify the current user
             String username = principal.getName();
             User user = userDao.getByUserName(username);
 
             if (user == null) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "User not found.");
+                // Send an HTTP 404 if the user is not found
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "User not found");
                 return;
             }
 
+            // Clear all items for this user
             shoppingCartDao.clearCart(user.getId());
         } catch (Exception e) {
+            // If any issue occurs, return an HTTP 500 response with a clear message
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to clear shopping cart.");
         }
     }
-
 }
