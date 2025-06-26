@@ -1,190 +1,154 @@
-# E-Commerce API Capstone Project
 
-## Overview
+# 🛍️ E-Commerce API — Capstone Project
 
-This is a Spring Boot-based E-Commerce API that provides RESTful endpoints for managing products, categories, users, and shopping cart functionality. The project includes a complete web application frontend and comprehensive API backend with JWT authentication and role-based authorization.
+## What This Is
 
-## 🎯 My Contribution
+This is a Java-based **E-Commerce API** built using **Spring Boot**. It lets users do basic online shopping tasks like:
+- Browsing categories and products
+- Managing a shopping cart
+- Logging in and out (with different user roles like regular user or admin)
 
-I implemented the **Categories functionality** for this E-Commerce API, which includes:
+This project comes with both:
+- A working **backend API**
+- A simple **web frontend**
 
-- **CategoriesController** - REST API endpoints for category management
-- **MySqlCategoryDao** - MySQL implementation of category data access
+Everything uses **JWT tokens for login**, and there's role-based access (so regular users can’t do admin stuff).
 
-### Categories API Endpoints
+---
 
-| Method | Endpoint | Description | Authorization |
-|--------|----------|-------------|---------------|
-| GET | `/categories` | Get all categories | Public |
-| GET | `/categories/{id}` | Get category by ID | Public |
-| GET | `/categories/{categoryId}/products` | Get products by category | Public |
-| POST | `/categories` | Create new category | Admin only |
-| PUT | `/categories/{id}` | Update category | Admin only |
-| DELETE | `/categories/{id}` | Delete category | Admin only |
+## 💻 What I Built
 
-## 🏗️ Project Structure
+I worked on these parts of the project:
+
+- ✅ `CategoriesController.java` — API controller for managing categories
+- ✅ `MySqlCategoryDao.java` — DAO class for category database access
+- ✅ `ShoppingCartController.java` — API controller for shopping cart
+- ✅ `MySqlShoppingCartDao.java` — DAO class for cart logic
+- ✅ `ShoppingCartDao.java` — DAO interface for cart features
+
+Everything else was provided as part of the assignment.
+
+---
+
+## 🧪 Categories API
+
+| Method | Endpoint | What it does | Who can use it |
+|--------|----------|-----------------------|---------------|
+| GET    | `/categories`                    | Get all categories               | Anyone |
+| GET    | `/categories/{id}`              | Get one category by ID          | Anyone |
+| GET    | `/categories/{id}/products`     | Get all products in a category  | Anyone |
+| POST   | `/categories`                   | Add a new category              | Admin only |
+| PUT    | `/categories/{id}`              | Update a category               | Admin only |
+| DELETE | `/categories/{id}`              | Delete a category               | Admin only |
+
+---
+
+## 🔍 Project Folder Overview
 
 ```
 capstone-starter/
-├── src/main/java/org/yearup/
-│   ├── controllers/
-│   │   ├── CategoriesController.java     Implementation
-│   │   ├── ProductsController.java
-│   │   ├── AuthenticationController.java
-│   │   └── ShoppingCartController.java
-│   ├── data/
-│   │   ├── CategoryDao.java             Implementation
-│   │   ├── mysql/
-│   │   │   ├── MySqlCategoryDao.java      Implementation
-│   │   │   ├── MySqlProductDao.java
-│   │   │   ├── MySqlUserDao.java
-│   │   │   └── MySqlProfileDao.java
-│   │   └── ...
-│   ├── models/
-│   │   ├── Category.java                 Implementation
-│   │   ├── Product.java
-│   │   ├── User.java
-│   │   └── ...
-│   └── security/                         
-environment
-└── capstone-client-web-application/      
-frontend
+├── controllers/
+│   ├── CategoriesController.java         
+│   └── ShoppingCartController.java       
+├── data/
+│   ├── ShoppingCartDao.java              
+│   └── mysql/
+│       ├── MySqlCategoryDao.java         
+│       └── MySqlShoppingCartDao.java     
+├── models/
+│   └── ...                               # Provided by instructor
+└── capstone-client-web-application/      # Provided web frontend
 ```
 
-## 🚀 Technologies Used
+---
 
-- **Backend**: Spring Boot 2.7.3, Spring Security, Spring JDBC
-- **Database**: Microsoft SQL Server
-- **Authentication**: JWT (JSON Web Tokens)
-- **Frontend**: HTML, CSS, JavaScript, Bootstrap, Axios
-- **Build Tool**: Maven
-- **Java Version**: 17
+## 🧰 Tools & Tech
 
-## 📋 Prerequisites
+- **Java 17**
+- **Spring Boot**
+- **Spring Security**
+- **JDBC (SQL)**
+- **Microsoft SQL Server**
+- **JWT (login tokens)**
+- **Bootstrap + JavaScript + Axios** (frontend)
 
-- Java 17 or higher
-- Maven 3.6+
-- Microsoft SQL Server (or access to the provided database)
-- Modern web browser
+---
 
-## 🛠️ Installation & Setup
+## ⚙️ How To Run It
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/AbrahamGhani/Week-12-Capstone-3.git
-   cd Week-12_Capstone-3
-   ```
+> You’ll need Java 17 and Maven.
 
-2. **Navigate to the project directory**
-   ```bash
-   cd capstone-starter
-   ```
+```bash
+git clone https://github.com/AbrahamGhani/Week-12-Capstone-3.git
+cd Week-12-Capstone-3/capstone-starter
+./mvnw clean install
+./mvnw spring-boot:run
+```
 
-3. **Build the project**
-   ```bash
-   ./mvnw clean install
-   ```
+Once running:  
+🔗 `http://localhost:8080`
 
-4. **Run the application**
-   ```bash
-   ./mvnw spring-boot:run
-   ```
+---
 
-The API will be available at `http://localhost:8080`
+## 🛢️ Database Info
 
-## 🗄️ Database Setup
-
-The application is configured to connect to a remote SQL Server database. The connection details are in `application.properties`:
+The app connects to a remote SQL Server. You don’t have to set anything up.  
+Info is in `application.properties`:
 
 ```properties
-spring.datasource.url=jdbc:sqlserver://skills4it.database.windows.net:1433;database=courses;encrypt=true;trustServerCertificate=false;loginTimeout=30;
+spring.datasource.url=jdbc:sqlserver://skills4it.database.windows.net:1433;...
 spring.datasource.username=YearUp
 spring.datasource.password=StrongP@ssword123
 ```
 
-## 🔐 Authentication
+---
 
-The API uses JWT-based authentication with role-based authorization:
+## 🔐 Login & Roles
 
-- **Public endpoints**: Categories and Products (read-only)
-- **User endpoints**: Shopping cart, profile management
-- **Admin endpoints**: Category and Product management
+- **User**: Can view products and manage their own cart
+- **Admin**: Can add/edit/delete categories & products
 
-### Default Users
-- **Regular User**: Can view products, manage shopping cart
-- **Admin User**: Full access to all endpoints including category management
+---
 
+## 🧪 Try It Out With Postman
 
-### API Testing with Postman
+Postman test files are included:
+- `easyshop-solo.postman_collection.json`
+- `easyshop-optional-solo.postman_collection.json`
 
-Postman collections are provided in the `capstone_postman_collections/` directory:
-- `easyshop-solo.postman_collection.json` - Basic API testing
-- `easyshop-optional-solo.postman_collection.json` - Advanced testing scenarios
-
-### Example API Calls
-
-**Get all categories:**
+Example API Call:
 ```bash
 GET http://localhost:8080/categories
 ```
 
-**Create a new category (Admin only):**
-```bash
-POST http://localhost:8080/categories
-Content-Type: application/json
-Authorization: Bearer <jwt-token>
+---
 
-{
-  "name": "Electronics",
-  "description": "Electronic devices and accessories"
-}
-```
+## ✅ Features I Helped Build
 
-**Get products by category:**
-```bash
-GET http://localhost:8080/categories/1/products
-```
-
-## 🔧 Key Features Implemented
-
-### Categories Management
-- ✅ **CRUD Operations**: Create, Read, Update, Delete categories
-- ✅ **RESTful API**: Standard HTTP methods with proper status codes
-- ✅ **Error Handling**: Comprehensive exception handling with meaningful error messages
-- ✅ **Security**: Role-based access control (Admin-only for write operations)
-- ✅ **Database Integration**: MySQL implementation with prepared statements
-- ✅ **Data Validation**: Proper input validation and error responses
-
-### Technical Highlights
-- **Prepared Statements**: SQL injection prevention
-- **Connection Management**: Proper resource cleanup with try-with-resources
-- **Exception Handling**: Graceful error handling with appropriate HTTP status codes
-- **Security**: Spring Security integration with method-level authorization
-- **Cross-Origin Support**: CORS enabled for frontend integration
-
-## 📚 Learning Outcomes
-
-Through this project, I gained experience with:
-
-- **Spring Boot Framework**: REST controllers, dependency injection, configuration
-- **Database Access**: JDBC with prepared statements, connection management
-- **Security**: JWT authentication, role-based authorization
-- **API Design**: RESTful principles, proper HTTP status codes
-- **Error Handling**: Exception management, user-friendly error messages
-- **Testing**: API testing with Postman, integration testing
-
-## 🤝 Acknowledgments
-
-- **Year Up**: For providing the comprehensive development environment
-- **Pluralsight**: For the educational resources and learning platform
-- **Spring Framework**: For the robust backend framework
-- **Bootstrap**: For the responsive frontend design
-- **Instructors**: For guidance throughout the development process
-
-## 📄 License
-
-This project is part of the Year Up Software Development curriculum.
+- Categories CRUD (Create, Read, Update, Delete)
+- Shopping Cart logic
+- Role-based access (User vs Admin)
+- Input validation & error handling
+- SQL injection prevention (via prepared statements)
 
 ---
 
-**Note**: This project was developed as part of a capstone assignment. The Categories functionality was implemented by me, while the rest of the application was provided as part of the development environment. 
+## 📘 What I Learned
+
+- How to use **Spring Boot** to build REST APIs
+- How to manage DB access with **DAOs and JDBC**
+- How to secure APIs using **JWT tokens** and role checks
+- How to organize a backend project
+- How to test APIs with Postman
+
+---
+
+## 🙏 Thanks To
+
+- Year Up
+- Spring Boot + Java community
+- Instructors & Pluralsight
+
+---
+
+> This was a capstone project. I built the shopping cart and category features, while the rest of the project (users, products, login system, etc.) was already set up.
