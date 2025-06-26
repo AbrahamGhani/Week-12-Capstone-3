@@ -10,9 +10,9 @@ class ShoppingCartService {
     addToCart(productId)
     {
         const url = `${config.baseUrl}/cart/products/${productId}`;
-        // const headers = userService.getHeaders();
+         const headers = userService.getHeaders();
 
-        axios.post(url, {})// ,{headers})
+        axios.post(url, {} ,{headers})
             .then(response => {
                 this.setCart(response.data)
 
@@ -153,11 +153,13 @@ class ShoppingCartService {
                      total: 0
                  }
 
+/*
                  this.cart.total = response.data.total;
 
                  for (const [key, value] of Object.entries(response.data.items)) {
                      this.cart.items.push(value);
                  }
+*/
 
                  this.updateCartDisplay()
                  this.loadCartPage()

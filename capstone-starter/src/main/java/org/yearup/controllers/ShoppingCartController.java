@@ -119,6 +119,7 @@ public class ShoppingCartController
     // Completely clears out the user's shopping cart.
     @DeleteMapping
     @PreAuthorize("hasRole('ROLE_USER')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void clearCart(Principal principal, HttpServletResponse response) throws IOException
     {
         try {
