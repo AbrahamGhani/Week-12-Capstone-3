@@ -7,8 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.yearup.data.OrdersDao;
+import org.yearup.data.ProfileDao;
 import org.yearup.data.ShoppingCartDao;
 import org.yearup.data.UserDao;
 import org.yearup.models.*;
@@ -16,6 +18,8 @@ import org.yearup.models.*;
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("orders")
@@ -25,18 +29,26 @@ public class OrdersController {
     private final ShoppingCartDao shoppingCartDao;
     private final OrdersDao ordersDao;
     private final UserDao userDao;
-
+    private final ProfileDao profileDao;
 
     @Autowired
-    public OrdersController(ShoppingCartDao shoppingCartDao, OrdersDao orderDao, UserDao userDao) {
+    public OrdersController(ShoppingCartDao shoppingCartDao,
+                           OrdersDao orderDao,
+                           UserDao userDao,
+                           ProfileDao profileDao) { // <-- inject here
         this.shoppingCartDao = shoppingCartDao;
         this.ordersDao = orderDao;
         this.userDao = userDao;
+        this.profileDao = profileDao;
     }
+
+
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> checkout(Principal principal) {
         String username = principal.getName();
         User user = userDao.getByUserName(username);
+        Profile profile = profileDao.getByUserId(user.getId());
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found.");
@@ -57,8 +69,15 @@ public class OrdersController {
         order.setUserId(user.getId());
         order.setOrderDate(LocalDateTime.now());
         order.setTotalAmount(total);
+        order.setAddress(profile.getAddress());
+        order.setCity(profile.getCity());
+        order.setState(profile.getState());
+        order.setZip(profile.getZip());
+        order.setShippingAmount(new BigDecimal("5.99"));
 
         ordersDao.createOrder(order); // Order ID should now be set
+
+        List<OrderItem> orderItems = new ArrayList<>();
 
         // 4. Create and persist OrderLineItems
         for (ShoppingCartItem item : cart.getItems().values()) {
@@ -67,14 +86,26 @@ public class OrdersController {
             orderItem.setProductId(item.getProductId());
             orderItem.setQuantity(item.getQuantity());
             orderItem.setPrice(item.getProduct().getPrice()); // Storing per-unit price
-
+            orderItem.setDiscount(new BigDecimal("0.00"));
             ordersDao.addItem(orderItem);
+            orderItems.add(orderItem);
         }
 
         // 5. Clear user's shopping cart
         shoppingCartDao.clearCart(user.getId());
 
-        return ResponseEntity.ok("Order placed successfully.");
+        // Return a proper DTO
+        OrderDTO dto = new OrderDTO();
+        dto.setOrderId(order.getId());
+        dto.setTotalAmount(order.getTotalAmount());
+        dto.setShippingAmount(order.getShippingAmount());
+        dto.setAddress(order.getAddress());
+        dto.setCity(order.getCity());
+        dto.setState(order.getState());
+        dto.setZip(order.getZip());
+        dto.setLineItems(orderItems);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
 
