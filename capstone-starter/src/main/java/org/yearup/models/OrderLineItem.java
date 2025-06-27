@@ -2,7 +2,7 @@ package org.yearup.models;
 
 import java.math.BigDecimal;
 
-public class OrderItem {
+public class OrderLineItem {
 
 
     private int id;
@@ -12,10 +12,10 @@ public class OrderItem {
     private BigDecimal price;
     private BigDecimal discount;
 
-    public OrderItem() {
+    public OrderLineItem() {
     }
 
-    public OrderItem(int id, int orderId, int productId, int quantity, BigDecimal price, BigDecimal discount) {
+    public OrderLineItem(int id, int orderId, int productId, int quantity, BigDecimal price, BigDecimal discount) {
         this.id = id;
         this.orderId = orderId;
         this.productId = productId;

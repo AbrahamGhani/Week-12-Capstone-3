@@ -1,41 +1,62 @@
 package org.yearup.models;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 public class OrderDTO {
 
-    private int orderId;
-    private BigDecimal totalAmount;
-    private BigDecimal shippingAmount;
+    private int id;
+    private int userId;
+    private LocalDateTime orderDate;
+
     private String address;
     private String city;
     private String state;
     private String zip;
-    private List<OrderItem> items;
 
-    // Getters and setters
+    private BigDecimal totalAmount;
+    private BigDecimal shippingAmount;
 
-    public int getOrderId() {
-        return orderId;
+    private List<OrderLineItem> lineItems;
+
+    public OrderDTO() {
     }
 
-    public void setOrderId(int orderId) {
-        this.orderId = orderId;
-    }
 
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
+    public OrderDTO(int id, int userId, LocalDateTime orderDate, String address, String city, String state, String zip, BigDecimal totalAmount, BigDecimal shippingAmount, List<OrderLineItem> lineItems) {
+        this.id = id;
+        this.userId = userId;
+        this.orderDate = orderDate;
+        this.address = address;
+        this.city = city;
+        this.state = state;
+        this.zip = zip;
         this.totalAmount = totalAmount;
-    }
-
-    public BigDecimal getShippingAmount() {
-        return shippingAmount;
-    }
-
-    public void setShippingAmount(BigDecimal shippingAmount) {
         this.shippingAmount = shippingAmount;
+        this.lineItems = lineItems;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public LocalDateTime getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(LocalDateTime orderDate) {
+        this.orderDate = orderDate;
     }
 
     public String getAddress() {
@@ -70,12 +91,27 @@ public class OrderDTO {
         this.zip = zip;
     }
 
-    public List<OrderItem> getItems() {
-        return items;
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
     }
 
-    public void setLineItems(List<OrderItem> items) {
-        this.items = items;
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
+    public BigDecimal getShippingAmount() {
+        return shippingAmount;
+    }
+
+    public void setShippingAmount(BigDecimal shippingAmount) {
+        this.shippingAmount = shippingAmount;
+    }
+
+    public List<OrderLineItem> getLineItems() {
+        return lineItems;
+    }
+
+    public void setLineItems(List<OrderLineItem> lineItems) {
+        this.lineItems = lineItems;
+    }
 }
