@@ -19,7 +19,8 @@ public class Order {
     public Order() {
     }
 
-    public Order(int id, int userId, LocalDateTime orderDate, String address, String city, String state, String zip, BigDecimal shippingAmount, BigDecimal totalAmount, List<OrderLineItem> lineItems) {
+    public Order(int id, int userId, LocalDateTime orderDate, String address, String city,
+                 String state, String zip, BigDecimal shippingAmount, BigDecimal totalAmount, List<OrderLineItem> lineItems) {
         this.id = id;
         this.userId = userId;
         this.orderDate = orderDate;
